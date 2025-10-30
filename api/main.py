@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from init_llm import init_llm
+from models import PostRequest, PostResponse
 
 app = FastAPI()
 
@@ -19,3 +20,14 @@ def read_item():
     )
 
     return ai_message.content
+
+
+@app.post("/chat")
+async def reply_chat_message(request: PostRequest):
+    llm = init_llm()
+
+    ai_message = llm.invoke(request.human_message)
+
+    print(ai_message.content)
+
+    return PostResponse(ai_message=ai_message.content)
