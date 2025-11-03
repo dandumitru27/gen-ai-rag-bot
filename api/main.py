@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from init_llm import init_llm
+from llm_graph import create_llm_graph, init_llm
 from models import PostRequest, PostResponse
 
-app = FastAPI()
+graph = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global graph
+    graph = create_llm_graph()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -38,9 +49,11 @@ def read_item():
 
 @app.post("/chat")
 async def reply_chat_message(request: PostRequest):
-    llm = init_llm()
+    config = {"configurable": {"thread_id": "abc123"}}
 
-    ai_message = llm.invoke(request.human_message)
+    output = graph.invoke({"messages": [request.human_message]}, config)
+
+    ai_message = output["messages"][-1]
 
     print(ai_message.content)
 
