@@ -3,9 +3,11 @@
 import ChatBot from "react-chatbotify";
 
 export default function Home() {
+  let thread_id = "";
+
   async function fetchData(human_message: string) {
     try {
-      const body = { human_message: human_message };
+      const body = { human_message: human_message, thread_id: thread_id };
 
       const response = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
@@ -16,6 +18,8 @@ export default function Home() {
       });
 
       const data = await response.json();
+
+      thread_id = data.thread_id;
 
       return data.ai_message;
     } catch (error) {

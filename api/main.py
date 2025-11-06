@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,7 +51,12 @@ def read_item():
 
 @app.post("/chat")
 async def reply_chat_message(request: PostRequest):
-    config = {"configurable": {"thread_id": "abc123"}}
+    thread_id = request.thread_id
+
+    if thread_id == "":
+        thread_id = str(uuid.uuid4())[:8]
+
+    config = {"configurable": {"thread_id": thread_id}}
 
     output = graph.invoke({"messages": [request.human_message]}, config)
 
@@ -57,4 +64,4 @@ async def reply_chat_message(request: PostRequest):
 
     print(ai_message.content)
 
-    return PostResponse(ai_message=ai_message.content)
+    return PostResponse(ai_message=ai_message.content, thread_id=thread_id)
