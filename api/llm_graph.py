@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -18,16 +20,21 @@ def init_llm():
     return llm
 
 
+def load_system_prompt():
+    base = Path(__file__).resolve().parent
+
+    with open(f"{base}/system_prompt.txt", "r", encoding="utf-8") as file:
+        return file.read()
+
+
 def create_llm_graph():
     llm = init_llm()
 
+    system_prompt = load_system_prompt()
+
     prompt_template = ChatPromptTemplate.from_messages(
         [
-            (
-                "system",
-                "Esti un asistent care raspunde la intrebarile clientilor. "
-                "Vorbeste in limba romana si raspunde scurt, intr-un singur paragraf.",
-            ),
+            ("system", system_prompt),
             MessagesPlaceholder(variable_name="messages"),
         ]
     )

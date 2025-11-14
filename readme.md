@@ -2,6 +2,6 @@
 
 pip install -r requirements.txt
 
-\api> fastapi dev main.py
+fastapi dev api/main.py
 
 \bot-ui> npm run dev

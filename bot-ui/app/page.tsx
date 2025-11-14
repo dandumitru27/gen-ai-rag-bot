@@ -43,6 +43,7 @@ export default function Home() {
 
   return (
     <ChatBot
+      styles={{ chatWindowStyle: { height: "90vh" } }}
       settings={{
         general: { embedded: true },
         footer: { text: "" },
