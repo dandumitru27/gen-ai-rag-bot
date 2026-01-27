@@ -1,6 +1,15 @@
+GET http://127.0.0.1:8000/ HTTP/1.1
+
+###
+
+GET http://127.0.0.1:8000/intro HTTP/1.1
+
+###
+
 POST http://127.0.0.1:8000/chat HTTP/1.1
 content-type: application/json
 
 {
-    "human_message": "Who's your maker?"
+    "human_message": "Zi-mi un eveniment istoric important din secolul 2 e.n.",
+    "thread_id": null
 }

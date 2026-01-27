@@ -3,16 +3,17 @@ import uuid
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from llm_graph import create_llm_graph, init_llm
-from models import PostRequest, PostResponse
 
-graph = None
+from api.agent import configure_agent, init_model
+from api.models import PostRequest, PostResponse
+
+agent = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global graph
-    graph = create_llm_graph()
+    global agent
+    agent = configure_agent()
     yield
 
 
@@ -33,17 +34,16 @@ app.add_middleware(
 
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def healthcheck():
+    return {"Health": "OK"}
 
 
-@app.get("/hello")
-def read_item():
-    llm = init_llm()
+@app.get("/intro")
+def run_intro_query():
+    model = init_model()
 
-    ai_message = llm.invoke(
-        "Who's your maker? Also, tell me the name of an interesting historic moment from a random century. "
-        "Pick a random number from 1 to 41, then with its index pick a century from 20th century BC to 21st century AD."
+    ai_message = model.invoke(
+        "Who's your maker? Also, tell me the name of an interesting historic moment from the 6th century BC."
     )
 
     return ai_message.content
@@ -53,12 +53,12 @@ def read_item():
 async def reply_chat_message(request: PostRequest):
     thread_id = request.thread_id
 
-    if thread_id == "":
+    if not thread_id or thread_id == "":
         thread_id = str(uuid.uuid4())[:8]
 
     config = {"configurable": {"thread_id": thread_id}}
 
-    output = graph.invoke({"messages": [request.human_message]}, config)
+    output = agent.invoke({"messages": [request.human_message]}, config)
 
     ai_message = output["messages"][-1]
 
