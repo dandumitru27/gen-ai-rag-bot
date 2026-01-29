@@ -60,8 +60,13 @@ async def reply_chat_message(request: PostRequest):
 
     output = agent.invoke({"messages": [request.human_message]}, config)
 
-    ai_message = output["messages"][-1]
+    ai_message = output["messages"][-1].content
 
-    print(ai_message.content)
+    print(ai_message)
 
-    return PostResponse(ai_message=ai_message.content, thread_id=thread_id)
+    if isinstance(ai_message, str):
+        ai_message_text = ai_message
+    else:
+        ai_message_text = ai_message[0]["text"]
+
+    return PostResponse(ai_message=ai_message_text, thread_id=thread_id)
