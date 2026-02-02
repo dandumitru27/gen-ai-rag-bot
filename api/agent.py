@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 from langchain.tools import tool
+from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -12,6 +13,10 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langgraph.checkpoint.memory import InMemorySaver
 
 provider = "google_genai"  # "google_genai" / "openai"
+vector_store_provider = "chroma"  # "chroma" / "in_memory"
+load_docs_in_vector_store_on_startup = (
+    False  # change to False if you use Chroma and have already loaded docs
+)
 
 vector_store = None
 
@@ -31,7 +36,9 @@ def configure_agent():
 
     global vector_store
     vector_store = init_vector_store()
-    load_documents_to_vector_store()
+
+    if load_docs_in_vector_store_on_startup:
+        load_documents_to_vector_store()
 
     tools = [retrieve_context]
 
@@ -57,14 +64,18 @@ def init_vector_store():
     elif provider == "openai":
         embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
 
-    return InMemoryVectorStore(embeddings)
+    if vector_store_provider == "chroma":
+        return Chroma(
+            embedding_function=embeddings,
+            persist_directory="./api/chroma_langchain_db",
+        )
+    else:
+        return InMemoryVectorStore(embeddings)
 
 
 def load_markdown_documents():
-    base = Path(__file__).resolve().parent
-
     loader = DirectoryLoader(
-        path=f"{base}/documents/markdown",
+        path=f"./api/documents/markdown",
         glob="**/*.md",
         loader_cls=TextLoader,
     )
@@ -97,7 +108,5 @@ def retrieve_context(query: str):
 
 
 def load_system_prompt():
-    base = Path(__file__).resolve().parent
-
-    with open(f"{base}/system_prompt.txt", "r", encoding="utf-8") as file:
+    with open(f"./api/system_prompt.txt", "r", encoding="utf-8") as file:
         return file.read()

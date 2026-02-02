@@ -1,4 +1,5 @@
 import uuid
+from random import randint
 
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
@@ -42,8 +43,11 @@ def healthcheck():
 def run_intro_query():
     model = init_model()
 
+    century = randint(1, 21)
+    ad_bc = "AD" if randint(1, 2) == 1 else "BC"
+
     ai_message = model.invoke(
-        "Who's your maker? Also, tell me the name of an interesting historic moment from the 6th century BC."
+        f"Who's your maker? Also, tell me in a sentence about an interesting historic moment from the {century}th century {ad_bc}."
     )
 
     return ai_message.content

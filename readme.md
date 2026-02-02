@@ -2,6 +2,14 @@
 
 GenAI bot to perform RAG on local documents, using Gemini or GPT-5. API with Python, FastAPI, and LangChain, front-end with React, Next.js, and Chatbotify. Work in progress.
 
+## Configurations
+
+In `agent.py` you can change:
+
+LLM Provider: Google Gemini or OpenAI
+
+Vector Store: Chroma (local) or InMemory
+
 ## Start API and bot-ui
 
 fastapi dev api/main.py
@@ -11,7 +19,7 @@ fastapi dev api/main.py
 ## Initial setup
 
 ~ new virtual environment  
-py -m venv .venv
+py -3.10 -m venv .venv
 
 ~ activate env  
 .venv\Scripts\activate.bat

@@ -10,6 +10,6 @@ POST http://127.0.0.1:8000/chat HTTP/1.1
 content-type: application/json
 
 {
-    "human_message": "Zi-mi un eveniment istoric important din secolul 2 e.n.",
+    "human_message": "Ce documente trebuie sa pastrez pentru garantie?",
     "thread_id": null
 }
