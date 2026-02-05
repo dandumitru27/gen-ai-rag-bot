@@ -29,6 +29,9 @@ py -3.10 -m venv .venv
 ~ install all dependencies  
 poetry install
 
+~ prepare .env file  
+Make a copy of the provided `.env.template` file, rename it to `.env` and put there your secret keys, you can also use only one of GOOGLE_API_KEY and OPENAI_API_KEY.
+
 ## Helpful commands
 
 ~ add new package  
