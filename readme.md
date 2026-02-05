@@ -10,6 +10,8 @@ LLM Provider: Google Gemini or OpenAI
 
 Vector Store: Chroma (local) or InMemory
 
+Source documents to use (what format): Markdown or PDF
+
 ## Start API and bot-ui
 
 fastapi dev api/main.py
