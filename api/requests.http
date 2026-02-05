@@ -10,6 +10,16 @@ POST http://127.0.0.1:8000/chat HTTP/1.1
 content-type: application/json
 
 {
-    "human_message": "Ce documente trebuie sa pastrez pentru garantie?",
+    "human_message": "Care e durata garantiei?",
+    "thread_id": null
+}
+
+###
+
+POST http://127.0.0.1:8000/chat HTTP/1.1
+content-type: application/json
+
+{
+    "human_message": "Ce metode de livrare sunt disponibile?",
     "thread_id": null
 }

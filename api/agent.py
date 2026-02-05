@@ -1,12 +1,12 @@
-from pathlib import Path
-
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_docling import DoclingLoader
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -52,10 +52,13 @@ def configure_agent():
 
 
 def load_documents_to_vector_store():
-    documents = load_markdown_documents()
+    documents = load_source_documents()
     splits = split_documents(documents)
 
-    vector_store.add_documents(splits)
+    # filter out complex metadata that Chroma doesn't support
+    filtered_splits = filter_complex_metadata(splits)
+
+    vector_store.add_documents(filtered_splits)
 
 
 def init_vector_store():
@@ -73,12 +76,19 @@ def init_vector_store():
         return InMemoryVectorStore(embeddings)
 
 
-def load_markdown_documents():
-    loader = DirectoryLoader(
-        path=f"./api/documents/markdown",
-        glob="**/*.md",
-        loader_cls=TextLoader,
-    )
+def load_source_documents():
+    document_type = "pdf"  # "markdown" / "pdf"
+
+    if document_type == "markdown":
+        loader = DirectoryLoader(
+            path="./api/documents/markdown",
+            loader_cls=TextLoader,
+        )
+    elif document_type == "pdf":
+        loader = DirectoryLoader(
+            path="./api/documents/pdf",
+            loader_cls=DoclingLoader,
+        )
 
     return loader.load()
 
